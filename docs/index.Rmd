@@ -1,5 +1,5 @@
 ---
-title: "Proyección Remesas"
+title: "Modelo Proyección Remesas"
 author: "Subgerencia de Estudios y Programación Macroeconómica"
 date: "Febrero, 2025"
 output:
@@ -450,9 +450,9 @@ colnames(df_anual_var) <- gsub("^niv_([[:alnum:]_]+)_var$", "\\1", colnames(df_a
 ```
 
 
-# Gráficos Proyecciones
+# Proyecciones
 
-## Variación t/t-4
+## Variación trimestral t/t-4
 ```{r echo=FALSE}
 #Base 1
 trime_1 <- df[73:nrow(df), c("Fecha", "REM_REC_t4")]
@@ -496,6 +496,11 @@ anual_mill <- left_join(trime_4, df_anualUSD, by = "año")
 
 ```{r echo=FALSE}
 var_trim_anual$Fecha <- as.Date(var_trim_anual$Fecha)
+nombres <- names(var_trim_anual)[3:11]
+
+for (var in nombres) {
+  var_trim_anual[27,var] <- var_trim_anual[27,"REM_REC_t4"]
+}
 
 var_tri_anual <- highchart() %>%
   hc_add_series(var_trim_anual, yAxis = 0, showInLengend = TRUE, marker=list(enabled=F), 
@@ -512,7 +517,7 @@ var_tri_anual <- highchart() %>%
   hc_add_series(var_trim_anual, yAxis = 0, showInLengend = TRUE, marker=list(enabled=F), 
                 type = "line", name = "Forecast", 
                 hcaes(x = Fecha, y = fcast), color = 'gray') %>%
-  hc_title(text = "Proyeccion de las remesas", style = list(fontSize = '14px',
+  hc_title(text = "Proyección de las remesas", style = list(fontSize = '14px',
                                                             fontWeight = 'bold'),
            align = "center") %>% 
   hc_subtitle(text = "Porcentaje, 2018-2026", 
@@ -528,11 +533,17 @@ var_tri_anual
 
 ```
 
-## Variación t/t-1
+## Variación trimestral t/t-1
 
 ```{r echo=FALSE}
 
 var_trim_trim$Fecha <- as.Date(var_trim_trim$Fecha)
+
+nombres <- names(var_trim_trim)[3:11]
+
+for (var in nombres) {
+  var_trim_trim[27,var] <- var_trim_trim[27,"REM_REC_t1"]
+}
 
 var_tri_trim <- highchart() %>%
   hc_add_series(var_trim_trim, yAxis = 0, showInLengend = TRUE, marker=list(enabled=F), 
@@ -549,7 +560,7 @@ var_tri_trim <- highchart() %>%
   hc_add_series(var_trim_trim, yAxis = 0, showInLengend = TRUE, marker=list(enabled=F), 
                 type = "line", name = "Forecast", 
                 hcaes(x = Fecha, y = fcast), color = 'gray') %>%
-  hc_title(text = "Proyeccion de las remesas", style = list(fontSize = '14px',
+  hc_title(text = "Proyección de las remesas", style = list(fontSize = '14px',
                                                             fontWeight = 'bold'),
            align = "center") %>% 
   hc_subtitle(text = "Porcentaje, 2018-2026", 
@@ -570,6 +581,11 @@ var_tri_trim
 ```{r echo=FALSE}
 
 var_trim_mill$Fecha <- as.Date(var_trim_mill$Fecha)
+nombres <- names(var_trim_mill)[3:11]
+
+for (var in nombres) {
+  var_trim_mill[27,var] <- var_trim_mill[27,"REM_REC"]
+}
 
 var_tri_millo <- highchart() %>%
   hc_add_series(var_trim_mill, yAxis = 0, showInLengend = TRUE, marker=list(enabled=F), 
@@ -586,7 +602,7 @@ var_tri_millo <- highchart() %>%
   hc_add_series(var_trim_mill, yAxis = 0, showInLengend = TRUE, marker=list(enabled=F), 
                 type = "line", name = "Forecast", 
                 hcaes(x = Fecha, y = fcast), color = 'gray') %>%
-  hc_title(text = "Proyeccion de las remesas", style = list(fontSize = '14px',
+  hc_title(text = "Proyección de las remesas", style = list(fontSize = '14px',
                                                             fontWeight = 'bold'),
            align = "center") %>% 
   hc_subtitle(text = "Millones USD, 2018-2026", 
@@ -602,12 +618,18 @@ var_tri_millo
 
 ```
 
-## Variación Anual Acumulada
+## Evolución anual en millones
 
 ```{r echo=FALSE}
 
 anual_mill$año <- as.Date(anual_mill$año, format="%Y%m%d")
 anual_mill$año <-  seq(as.Date("2018-01-01"), as.Date("2026-01-01"), by = "year")
+
+nombres <- names(anual_mill)[3:11]
+
+for (var in nombres) {
+  anual_mill[6,var] <- anual_mill[6,"REM_REC"]
+}
 
 var_anu_millo <- highchart() %>%
   hc_add_series(anual_mill, yAxis = 0, showInLengend = TRUE, marker=list(enabled=F), 
@@ -624,7 +646,7 @@ var_anu_millo <- highchart() %>%
   hc_add_series(anual_mill, yAxis = 0, showInLengend = TRUE, marker=list(enabled=F), 
                 type = "line", name = "Forecast", 
                 hcaes(x = año, y = fcast), color = 'gray') %>%
-  hc_title(text = "Proyeccion de las remesas", style = list(fontSize = '14px',
+  hc_title(text = "Proyección de las remesas", style = list(fontSize = '14px',
                                                             fontWeight = 'bold'),
            align = "center") %>% 
   hc_subtitle(text = "Millones USD, 2018-2026", 
@@ -637,6 +659,65 @@ var_anu_millo <- highchart() %>%
                           format="{value}"))  %>% hc_tooltip(valueDecimals=2)
 
 var_anu_millo
+
+
+```
+```{r include=FALSE}
+vart4_cols <- grep("_var", names(resultados_anual), value = T)
+resultadosne <- resultados_anual %>% dplyr::select(año, vart4_cols)
+resultadosne$año <-  seq(as.Date("2018-01-01"), as.Date("2026-01-01"), by = "year")
+
+resultadosne <- resultadosne[19:nrow(resultadosne),]
+resultadosne <- resultadosne %>% mutate(
+  var_og=if_else(row_number()<=25,niv_lower95_var,NA_real_)
+) %>% relocate(var_og) %>% relocate(año)
+
+resultadosne[7:9,2] <- NA
+resultadosne[1:6,3:11] <- NA
+
+variac <- grep("_var", names(resultadosne), value = T)
+
+for (var in variac) {
+  resultadosne[6,var] <- resultadosne[6,"var_og"]
+}
+
+
+```
+
+## Variación Anual 
+
+```{r echo=FALSE}
+
+
+
+var_anu_var <- highchart() %>%
+  hc_add_series(resultadosne, yAxis = 0, showInLengend = TRUE, marker=list(enabled=F), 
+                type = "line", name = "Remesas Obs", 
+                hcaes(x = año, y = var_og), color = coloresBCE[1]) %>%
+  hc_add_series(resultadosne, yAxis = 0, showInLengend = TRUE, marker=list(enabled=F), 
+                type = "arearange", name = "Forecast 68", 
+                hcaes(x = año, low = niv_lower68_var, high = niv_upper68_var), 
+                color = coloresBCE[7]) %>%
+  hc_add_series(resultadosne, yAxis = 0, showInLengend = TRUE, marker=list(enabled=F), 
+                type = "arearange", name = "Forecast 35", 
+                hcaes(x = año, low = niv_lower35_var, high = niv_upper35_var), 
+                color = coloresBCE[8]) %>%
+  hc_add_series(resultadosne, yAxis = 0, showInLengend = TRUE, marker=list(enabled=F), 
+                type = "line", name = "Forecast", 
+                hcaes(x = año, y = niv_fcast_var), color = 'gray') %>%
+  hc_title(text = "Proyeccion de las remesas", style = list(fontSize = '14px',
+                                                            fontWeight = 'bold'),
+           align = "center") %>% 
+  hc_subtitle(text = "Variación anual, 2018-2026", 
+              style = list(fontWeight = "light", fontSize = "12px"),
+              align = "center")%>%
+  hc_xAxis(type = "datetime",
+           labels = list(rotation = 270)) %>%
+  hc_yAxis(title = list(text = "Porcentaje", 
+                        style = list(fontWeight = "bold")),labels=list(
+                          format="{value}"))  %>% hc_tooltip(valueDecimals=2)
+
+var_anu_var
 
 
 ```
